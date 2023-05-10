@@ -70,24 +70,32 @@ app.post('/user', async (request, response) => {
       const action = {port: `http://localhost:${portNumber}/register`};
       response.render('register', action)
     } else {
-      
+      //Check if the login provided was valid, if so display their user page
+      await client.connect();
+      const result = await client.db(database).collection(usersCollection).findOne({username: username});
+
+      if (result !== null && result.password === password) {
+        response.render("user");
+      } else {
+        response.render("invalid");
+      }
     }
 });
 
 app.post('/register', async (request, response) => {
   const username = request.body.name;
   const password = request.body.passowrd;
-  const password2 = request.body.password2;
-  
+
   try {
     await client.connect();
-    let tempuser = {username: username, password: password};
-    let result = await client.db(databaseAndCollection.db).collection(databaseAndCollection.collection).insertOne(movie1);
+    //TODO: have to check if username has been taken before we register
+    //as of now values being passed are null
+    console.log(username + " " + password);
+    let tempUser = {username: username, password: password};
+    const result = await client.db(database).collection(usersCollection).insertOne(tempUser);
 
-    const variables = { name: name, email: email, gpa: gpa, 
-        background: background, date: date, home: `http://localhost:${portNumber}`
-    };
-    response.render("applicantsData", variables);
+    //initially users variables will be empty but we might still need to pass something
+    response.render("user");
   }
   catch (e) {
     console.error(e);

@@ -9,22 +9,21 @@
 
 <body>
     <img src="images/logo.png" id="logo">
-	<p id="title">Admin Login</p>
+	<p id="title">Register User</p>
     <a class="links" href="/">Home</a>
     <a class="links" href="/board">Jobs</a>
     <a class="links" href="/about">About</a>
     <a class="links" href="/login">Admin</a>
     <div id="form">
-        <script src="/jobBoardServer.js"></script>
-        <form id="login" action=<%- port %> method="post">
+        <form id="register" action=<%- port %> method="post">
             <fieldset>
-                <legend>Login</legend>
                 Username: <br>
                 <input type="text" size="20" id="username" name="username"> <br>
                 Password: <br>
                 <input type="text" size="20" id="password" name="password"> <br>
-                <div id="hint">Leave Username and Password blank to register a new user</div><br>
-                <input type="submit" value="Login">
+                Password: <br>
+                <input type="text" size="20" id="password2" name="password2"> <br>
+                <input type="submit" onclick="return password===password2" value="Login">
             </fieldset>
         </form>
     </div>

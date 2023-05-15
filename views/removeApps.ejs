@@ -1,34 +1,31 @@
-<!doctype html>
 <html lang="en">
 
 <head>
 	<meta charset="utf-8" />
 	<title>Login</title>
     <link href="css/style.css" rel="stylesheet" type="text/css">
-    <script src="/jobBoardServer.js"></script>
 </head>
 
 <body>
     <img src="images/logo.png" id="logo">
-	<p id="title">Extend a hand</p>
+	<p id="title">Found the right fit</p>
     <a class="links" href="/">Home</a>
     <a class="links" href="/board">Jobs</a>
     <a class="links" href="/about">About</a>
     <a class="links" href="/login">Login</a>
     <div id="form">
+        <script src="/jobBoardServer.js"></script>
         <form id="login" action=<%- port %> method="post">
             <fieldset>
                 <legend>Job Posting</legend>
-                Job Title: <br>
+                Name: <br>
                 <input type="text" size="20" id="title" name="title" required> <br>
-                Salary: <br>
-                <input type="number" size="20" id="salary" name="salary" required> <br>
-                Description: <br>
-                <textarea rows="5" cols="200" id="description" name="description" required></textarea>
-                Requirements:
-                <textarea rows="5" cols="200" id="requirements" name="requirements" required></textarea>
+                Email: <br>
+                <input type="email" size="20" id="email" name="email" required> <br>
+                Job Applied For:
+                <input type="text" size="20" id="title" name="title" required> <br>
 
-                <input type="submit" value="Post" onclick="return confirm('Are you sure everything is filled out correctly?')">
+                <input type="submit" value="Remove" onclick="return confirm('Are you sure you want to remove this applicant?')">
             </fieldset>
         </form>
     </div>

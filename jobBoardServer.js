@@ -51,7 +51,7 @@ app.get('/about', (request, response) => {
 
 // Render the admin login page
 app.get('/login', (request, response) => {
-    const action = {port: `http://localhost:${portNumber}/user`};
+    const action = {port: `http://localhost:${portNumber}/login`};
     response.render('login', action);
 });
 
@@ -60,15 +60,12 @@ app.get('/login', (request, response) => {
 //job board should have a filter to look through database and display listings
 //admin page should have a form to add jobs (think of neccessary info) 
 
-app.post('/user', async (request, response) => {
+app.post('/login', async (request, response) => {
     const username = request.body.username;
     const password = request.body.password;
 
     if (username === 'admin' && password === '1234') {
       response.render('admin');
-    } else if (username === '' && password === '') {
-      const action = {port: `http://localhost:${portNumber}/register`};
-      response.render('register', action)
     } else {
       //Check if the login provided was valid, if so display their user page
       await client.connect();
@@ -82,6 +79,11 @@ app.post('/user', async (request, response) => {
     }
 });
 
+app.get('/register', (request, response) => {
+  const action = {port: `http://localhost:${portNumber}/register`};
+  response.render('register', action)
+});
+
 app.post('/register', async (request, response) => {
   const username = request.body.name;
   const password = request.body.passowrd;
@@ -92,9 +94,10 @@ app.post('/register', async (request, response) => {
     await client.connect();
     //TODO: have to check if username has been taken before we register
     //as of now values being passed are null
-    console.log(username + " " + password);
-    let tempUser = {username: username, password: password};
-    const result = await client.db(database).collection(usersCollection).insertOne(tempUser);
+    if (username !== undefined && password !== undefined) {
+      let tempUser = {username: username, password: password};
+      const result = await client.db(database).collection(usersCollection).insertOne(tempUser);
+    }
 
     //initially users variables will be empty but we might still need to pass something
     response.render("user");
@@ -133,12 +136,44 @@ app.post('/addJobs', async (request, response) => {
   }
 });
 
-app.get('removeJob', (request, response) => {
-  const action = {port: `http://localhost:${portNumber}/removeJob`};
-  response.render("removeJob", action);
+app.get('/viewApps', (request, response) => {
+  const action = {port: `http://localhost:${portNumber}/viewApps`};
+  response.render("viewApps", action);
 });
 
-app.post('removeJob', async (request, response) => {
+app.post('/viewApps', async (request, response) => {
+  const title = request.body.title;
+
+  try {
+    await client.connect();
+    const cursor = client.db(database).collection(appCollection).find({job: {$e: title}});
+    let data = await cursor.toArray();
+
+    let table = "<table border=\"1\"><tr><th>Item</th><th>GPA</th></tr>";
+    data.forEach(elem => { 
+      if (elem.gpa >= gpa) {
+        table += `<tr><td>${elem.name}</td><td>${elem.gpa}</td></tr>`;
+      }
+    });
+    table += "</table>";
+
+    const variables = {table: table,
+            home: `http://localhost:${portNumber}`
+    };
+    response.render("displayGpas", variables);
+    } catch (e) {
+        console.error(e);
+    } finally {
+        await client.close();
+    }
+});
+
+app.get('/removeJobs', (request, response) => {
+  const action = {port: `http://localhost:${portNumber}/removeJobs`};
+  response.render("removeJobs", action);
+});
+
+app.post('/removeJobs', async (request, response) => {
   const title = request.body.title;
   const salary = request.body.salary;
 
@@ -146,6 +181,32 @@ app.post('removeJob', async (request, response) => {
     await client.connect();
     let targetJob = {title: title, salary: salary};
     const result = await client.db(database).collection(boardCollection).deleteOne(targetJob);
+
+    response.render("board");
+} catch (e) {
+    console.error(e);
+} finally {
+    await client.close();
+}
+});
+
+app.get('/removeApps', (request, response) => {
+  const action = {port: `http://localhost:${portNumber}/removeApps`};
+  response.render("removeApps", action);
+});
+
+app.post('/removeApps', async (request, response) => {
+  const name = request.body.name;
+  const email = request.body.email;
+  const title = request.body.title;
+
+  try {
+    await client.connect();
+    let targetApp = {name: name, email: email, title:title};
+    const result = await client.db(database).collection(appCollection).deleteOne(targetApp);
+
+    const action = {port: `http://localhost:${portNumber}/viewApps`};
+    response.render("viewApps", action);
 } catch (e) {
     console.error(e);
 } finally {
@@ -154,8 +215,7 @@ app.post('removeJob', async (request, response) => {
 });
 
 app.get('/board', (request, response) => {
-  const action = {port: `http://localhost:${portNumber}/admin`};
-  response.render('board', action);
+  response.render('board');
 });
 
 /*Server Command Line Interpreter*/

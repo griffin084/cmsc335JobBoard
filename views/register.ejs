@@ -15,7 +15,7 @@
     <a class="links" href="/about">About</a>
     <a class="links" href="/login">Login</a>
     <div id="form">
-        <script>
+        <script src="/jobBoardServer.js">
             function validate() {
                 const password = document.getElementById("password");
                 const password2 = document.getElementById("password2");
@@ -35,8 +35,7 @@
                 <input type="text" size="20" id="password" name="password" minlength="4" required> <br>
                 Password: <br>
                 <input type="text" size="20" id="password2" name="password2" minlength="4" required> <br>
-                <input type="submit" onclick="return validate()" value="Login">
-            </fieldset>
+                <input type="submit" value="Login" onclick="return validate()">             </fieldset>
         </form>
     </div>
 </body>

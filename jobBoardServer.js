@@ -86,6 +86,8 @@ app.post('/register', async (request, response) => {
   const username = request.body.name;
   const password = request.body.passowrd;
 
+  console.log(username + " " + password);
+
   try {
     await client.connect();
     //TODO: have to check if username has been taken before we register
@@ -102,6 +104,53 @@ app.post('/register', async (request, response) => {
   } finally {
     await client.close();
   }
+});
+
+app.get('/addJobs', (request,response) => {
+  const action = {port: `http://localhost:${portNumber}/addJobs`};
+  response.render("addJobs", action);
+});
+
+app.post('/addJobs', async (request, response) => {
+  const title = request.body.title;
+  const salary = request.body.salary;
+  const description = request.body.description;
+  const requirements = request.body.requirements;
+
+  try {
+    await client.connect();
+    let tempJob = {title: title, salary: salary, 
+      description: description, requirements: requirements};
+    const result = await client.db(database).collection(boardCollection).insertOne(tempJob);
+    
+    //initially users variables will be empty but we might still need to pass something
+    response.render("board");
+  }
+  catch (e) {
+    console.error(e);
+  } finally {
+    await client.close();
+  }
+});
+
+app.get('removeJob', (request, response) => {
+  const action = {port: `http://localhost:${portNumber}/removeJob`};
+  response.render("removeJob", action);
+});
+
+app.post('removeJob', async (request, response) => {
+  const title = request.body.title;
+  const salary = request.body.salary;
+
+  try {
+    await client.connect();
+    let targetJob = {title: title, salary: salary};
+    const result = await client.db(database).collection(boardCollection).deleteOne(targetJob);
+} catch (e) {
+    console.error(e);
+} finally {
+    await client.close();
+}
 });
 
 app.get('/board', (request, response) => {
